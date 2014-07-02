@@ -72,15 +72,3 @@ lag5By<-function(level,to) unlist(tapply(to,level,lag5))
 lag10By<-function(level,to) unlist(tapply(to,level,lag10))
 beforeBy<-function(level,to) unlist(tapply(to,level,before))
 afterBy<-function(level,to) unlist(tapply(to,level,after))
-
-
-# based on a datetime
-lag.dt.max<-function(x,dt,length=5){
-  y<-vector(length=length(x))
-  for(i in 1:length(x)){    
-    dt.index<-dt %in% dt[i]-0:5
-    x.lagged<-x[start.index:i]
-    y[i]<-max(x.lagged)
-  }
-  y
-}
