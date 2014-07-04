@@ -8,14 +8,16 @@ The analysis of cohort studies with repeated measurements per individual, or mul
 The functions are grouped into 2 groups: lagging windowing function and aggregation windowing functions.
 
 Aggregation functions
-  agg.allot = generic aggregation function that works over the levels of a categorical "group" variable
-  mean.allot
-  count.allot 
-  min.allot / max.allot
-  etc...
+---------------------
+* agg.allot = generic aggregation function that works over the levels of a categorical "group" variable
+* mean.allot
+* count.allot 
+* min.allot / max.allot
+* etc...
 
 Lagging functions
-  lagFun.allot = generic lagging function (can insert own function) that work over the levels of a group variable
-  lagMax5.allot = finds the maximum over a 5 day window starting on day 0 and going back 5 days
-  etc...
+-----------------
+* lagFun.allot = generic lagging function (can insert own function) that work over the levels of a group variable
+* lagMax5.allot = finds the maximum over a 5 day window starting on day 0 and going back 5 days
+* etc...
 
