@@ -67,28 +67,28 @@ lagSum<-function(to,lag=c(0,5),replace=NA) lagFun(to,lag,sumna,replace=replace)
 # feed it a logical vector x, returns logical vector of indices greater the first True val
 after<-function(x) { 
   ind<-1:length(x)
-  m<-min(c(Inf,ind[x]))
+  m<-min(c(Inf,ind[as.logical(x)]))
   y<-ind>m
   y  
 }
 
 afterIn<-function(x) { 
   ind<-1:length(x)
-  m<-min(c(Inf,ind[x]))
+  m<-min(c(Inf,ind[as.logical(x)]))
   y<-ind>=m
   y  
 }
 
 before<-function(x) { 
   ind<-1:length(x)
-  m<-min(c(Inf,ind[x]))
+  m<-min(c(Inf,ind[as.logical(x)]))
   y<-ind<m
   y  
 }
 
 beforeIn<-function(x) { 
   ind<-1:length(x)
-  m<-min(c(Inf,ind[x]))
+  m<-min(c(Inf,ind[as.logical(x)]))
   y<-ind<=m
   y  
 }
@@ -101,8 +101,15 @@ lagMax10.allot<-function(level,to) unlist(tapply(to,level,lagMax.10))
 lagMean.allot<-function(level,to,lag=c(0,5)) unlist(tapply(to,level,lagMean,lag=lag))
 lagSum.allot<-function(level,to,lag=c(0,5)) unlist(tapply(to,level,lagSum,lag=lag))
 
-
 before.allot<-function(level,to) unlist(tapply(to,level,before))
 beforeIn.allot<-function(level,to) unlist(tapply(to,level,beforeIn))
 after.allot<-function(level,to) unlist(tapply(to,level,after))
 afterIn.allot<-function(level,to) unlist(tapply(to,level,afterIn))
+
+# Get infection pressure
+getInfectionPressure<-getIP<-function(pid,spaceTime,infectious,infectiousLag=c(-1,7),incubationLag=c(0,5)){
+  infectiousPeriod<-lagMax.allot(pid,infectious,infectiousLag) # lag infectious patien-time 
+  pressure<-(sum.allot(spaceTime,infectious)-infectious)/count.allot(spaceTime)  # sum it up by ward and normalize by occupancy
+  pressureLag<-lagMean.allot(pid,pressure,incubationLag) # lag the infectious patient by incubation time
+  pressureLag
+}

@@ -1,19 +1,21 @@
-# Calculate disease pressure
-daily$infectious<-with(daily,lagMax.allot(peid,medany,c(0,3)))
-describe(daily$infectious)
-daily$dp<-with(daily,sum.allot(ward %+% datetime,infectious)-infectious)
-describe(daily$dp)
-daily$occ<-with(daily,count.allot(ward %+% datetime))
-describe(daily$occ)
-daily$dp.occ<-with(daily,dp/occ) # normalize by ward-level occupancy
-describe(daily$dp.occ)
+# Suppose you have a dataset that is in counting process format, which means 
+# that there is one record for each day. There is a disease outcome y, 
+# and patient id's
+out<-c(0,0,1,0,0,0,0,0,0,0) # the outcome (1 = event, 0 = no event)
+pid<-c(1,1,1,1,1,2,2,2,2,2) # a unique patient id
+day<-c(1,2,3,4,5,1,2,3,4,5) # the day 
 
-# Incidence rates in the exposure categories;
-with(subset(daily,sc==1),getIRs(cdi_event,lagMax5.allot(peid,dp.occ>0),weight))
-daily$dp.abx<-with(daily,lagMean.allot(peid,dp.occ))
-with(subset(daily,sc==1),getIRs(cdi_event,cut2(dp.abx,c(.25,.5,.75)),weight))
-with(subset(daily,sc==1),getIRs(cdi_event,lagMax10.allot(peid,medany) %+% cut2(dp.abx,c(.5)),weight))
+# Suppose that patients developing disease are considered infectious from the 
+# day before they develop disease until two days afterwards (there's a 1 day
+# diagnostic delay). Let's make a variable called infectiousness that captures 
+# when a given patient is exerting infectiousnes
+infectious<-lagMax.allot(pid,out,c(-1,2)); infectious 
 
-# Insanely statistically significant effects
-m<-glm(cdi_event ~ dp.abx*lagMax5.allot(peid,medany),  family=poisson("log"), data=daily, subset=sc==1); 
-summary(m)
+# Now, let's calculate the disease pressure "received" by these patients from others 
+dp<-sum.allot(day,infectious) - infectious; dp # remove disease pressure from self
+
+# Now we want to measure the association between disease pressure on risk.
+# We will restrict the data to "at-risk" follow-up time (prior to symptom
+# onset) using the "beforeIn.allot" function and tabulate
+hospit<-data.frame(out,pid,day,infectious,dp) # Create a data frame 
+with(hospit[beforeIn.allot(pid,out),],table(out,dp)) # Subset the data and make a table
